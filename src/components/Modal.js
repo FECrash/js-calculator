@@ -1,5 +1,6 @@
 import { EMPTY } from '../util/constants/index.js';
 import util from '../util/functions/index.js';
+import { isOperator } from '../util/functions/valid.js';
 
 const { $ } = util.dom;
 const { isEmpty } = util.valid;
@@ -18,9 +19,11 @@ const Modal = () => {
 
   return (input, output, targetId = '') => {
     const setState = (inputData, outputData, targetId) => {
+      let input = inputData;
+      if (isOperator(input[input.length - 1])) input = input.substr(0, input.length - 1);
       logs = !isEmpty(targetId)
         ? logs.filter(log => log.id !== targetId)
-        : [{ id: createUUID(), inputData, outputData }, ...logs];
+        : [{ id: createUUID(), inputData: input, outputData }, ...logs];
       render();
     };
 
