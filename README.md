@@ -1,1 +1,23 @@
-# js-calculator
+# 짝 프로그래밍 첫 번째 앱!
+> 바닐라 자바스크립트로 구현한 계산기🤩
+
+<br>
+
+## 🛠 Contributors 🛠
+
+<table>
+  <tr height="140px">
+    <td align="center">
+      <a href="https://github.com/InSeong-So"><img height="100px" width="100px" src="https://avatars.githubusercontent.com/u/18283006?v=4"/></a>
+      <br />
+      <a href="https://github.com/InSeong-So">InSeong-So</a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/programmer-heeney"><img height="100px" width="100px" src="https://avatars.githubusercontent.com/u/66028045?v=4"/></a>
+      <br />
+      <a href="https://github.com/programmer-heeney7">kimsooin77</a>
+    </td>
+  </tr>
+</table>
+
+<br>
