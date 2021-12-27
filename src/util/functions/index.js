@@ -1,6 +1,6 @@
-import { EMPTY } from '../constants/index.js';
+import { EMPTY, REGEXP_OPERATOR } from '../constants/index.js';
 
-export const $ = selector => document.querySelector(selector);
+export const $ = (selector, target = document) => target.querySelector(selector);
 
 /**
  *
@@ -8,7 +8,31 @@ export const $ = selector => document.querySelector(selector);
  * @param {*} regExp
  * @returns
  */
-export const filteredOperands = (input, regExp) => input.split(regExp);
+export const filteredOperands = input => {
+  const inputStr = typeof input !== 'string' ? `${input}` : input;
+  return inputStr.split(REGEXP_OPERATOR);
+};
+
+export const removeComma = target => {
+  const targetStr = typeof target !== 'string' ? `${target}` : target;
+  return targetStr.replace(/[,]/gi, EMPTY);
+};
+
+/**
+ *
+ * @param {*} value
+ * @returns
+ */
+export const putComma = target => {
+  return filteredOperands(target)
+    .map(item => {
+      if (item === EMPTY) return item;
+      const num = +item;
+      if (isNaN(num)) return item;
+      return num.toLocaleString('ko-kr');
+    })
+    .join('');
+};
 
 /**
  *
