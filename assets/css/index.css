@@ -63,6 +63,9 @@ p {
     padding-right: 5px;
     font-size: 32px;
     border-bottom: 1px solid black;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
 }
 
 .display-output {
