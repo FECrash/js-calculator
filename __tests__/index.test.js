@@ -1,11 +1,12 @@
+import fs from 'fs';
+import path from 'path';
+
 import Calculator from '../src/components/Calculator.js';
 import { clickHandler } from '../src/index.js';
-import { $ } from '../src/util/functions/index.js';
-
-// jest.mock('../src/index.js');
+import { $ } from '../src/util/functions/dom.js';
 
 // HTML 문자열
-const mockHTML = `
+window.document.body.innerHTML = `
 <!-- 외부 레이아웃 -->
 <div id="root">
   <!-- 입/출력 -->
@@ -60,51 +61,34 @@ const mockHTML = `
 </div>
 <div class="modal hidden">
   <div class="modal-container">
-    <ul class="modal-log">
-      <li class="modal-log-list">
-        <p>123+5</p>
-        <p>128</p>
-      </li>
-      <li class="modal-log-list">
-        <p>123+5</p>
-        <p>128</p>
-      </li>
-      <li class="modal-log-list">
-        <p>123+5</p>
-        <p>128</p>
-      </li>
-      <li class="modal-log-list">
-        <p>123+5</p>
-        <p>128</p>
-      </li>
-      <li class="modal-log-list">
-        <p>123+5</p>
-        <p>128</p>
-      </li>
-      <li class="modal-log-list">
-        <p>123+5</p>
-        <p>128</p>
-      </li>
-      <li class="modal-log-list">
-        <p>123+5</p>
-        <p>128</p>
-      </li>
-      <li class="modal-log-list">
-        <p>123+5</p>
-        <p>128</p>
-      </li>
-      <li class="modal-log-list">
-        <p>123+5</p>
-        <p>128</p>
-      </li>
-    </ul>
+    <ul class="modal-log"></ul>
   </div>
-</div>
-`;
+</div>`;
 
-// beforeEach(() => {
-//   Calculator.mockClear();
-// });
+const CLEAR = { target: $('#root > div.keypad > div:nth-child(1) > div:nth-child(1)') };
+const BACKSPACE = { target: $('#root > div.keypad > div:nth-child(1) > div:nth-child(2)') };
+const MODULO = { target: $('#root > div.keypad > div:nth-child(1) > div:nth-child(3)') };
+const DIVISION = { target: $('#root > div.keypad > div:nth-child(1) > div:nth-child(4)') };
+
+const NUM_7 = { target: $('#root > div.keypad > div:nth-child(2) > div:nth-child(1)') };
+const NUM_8 = { target: $('#root > div.keypad > div:nth-child(2) > div:nth-child(2)') };
+const NUM_9 = { target: $('#root > div.keypad > div:nth-child(2) > div:nth-child(3)') };
+const MULTIPLICATION = { target: $('#root > div.keypad > div:nth-child(2) > div:nth-child(4)') };
+
+const NUM_4 = { target: $('#root > div.keypad > div:nth-child(3) > div:nth-child(1)') };
+const NUM_5 = { target: $('#root > div.keypad > div:nth-child(3) > div:nth-child(2)') };
+const NUM_6 = { target: $('#root > div.keypad > div:nth-child(3) > div:nth-child(3)') };
+const SUBTRACTION = { target: $('#root > div.keypad > div:nth-child(3) > div:nth-child(4)') };
+
+const NUM_3 = { target: $('#root > div.keypad > div:nth-child(4) > div:nth-child(1)') };
+const NUM_2 = { target: $('#root > div.keypad > div:nth-child(4) > div:nth-child(2)') };
+const NUM_1 = { target: $('#root > div.keypad > div:nth-child(4) > div:nth-child(3)') };
+const ADDITION = { target: $('#root > div.keypad > div:nth-child(4) > div:nth-child(4)') };
+
+const SIGN = { target: $('#root > div.keypad > div:nth-child(5) > div:nth-child(1)') };
+const NUM_0 = { target: $('#root > div.keypad > div:nth-child(5) > div:nth-child(2)') };
+const DOT = { target: $('#root > div.keypad > div:nth-child(5) > div:nth-child(3)') };
+const EQUALS = { target: $('#root > div.keypad > div:nth-child(5) > div:nth-child(4)') };
 
 describe('연산', () => {
   describe('실제 숫자가 양수이고, 기호를 하나씩 사용한다.', () => {
@@ -201,132 +185,129 @@ describe('연산예외', () => {
   });
 });
 
+// https://ilikekillnerds.com/2020/02/testing-event-listeners-in-jest-without-using-a-library/
+// https://stackoverflow.com/questions/59262223/vanilla-js-jest-test-click-event
 describe('입력', () => {
-  beforeEach(() => {
-    document.body.innerHTML = mockHTML;
-  });
-
-  /* eslint-disable no-import-assign */
-  // clickHandler = jest.fn();
+  beforeEach(() => {});
 
   describe('백스페이스 버튼을 클릭한다.', () => {
-    test('아무것도 없는 경우 아무것도 하지 않는다.', () => {
-      clickHandler('⬅');
+    test('아무것도 CLEAR는 경우 아무것도 하지 않는다.', () => {
+      clickHandler(BACKSPACE);
       expect($('.display-input').textContent).toBe('');
     });
     test('마지막이 피연산자인 경우 뒤에서 한 자리를 지운다.', () => {
       $('.display-input').textContent = '1234';
-      clickHandler('⬅');
-      expect(clickHandler).toHaveBeenCalledWith('⬅');
+      clickHandler(BACKSPACE);
       expect($('.display-input').textContent).toBe('123');
     });
     test('마지막이 연산자인 경우 연산자를 지운다.', () => {
       $('.display-input').textContent = '123+';
-      clickHandler('⬅');
+      clickHandler(BACKSPACE);
       expect($('.display-input').textContent).toBe('123');
     });
     test('결과만 존재하는 경우 결과를 지운다.', () => {
+      $('.display-input').textContent = '';
       $('.display-output').textContent = '246';
-      clickHandler('⬅');
+      clickHandler(BACKSPACE);
       expect($('.display-output').textContent).toBe('');
     });
-    test('입력과 결과가 존재하는 경우 입력을 한 칸 지우고 다시 계산하여 결과에 출력한다.', () => {
+    test('입력과 결과가 존재하는 경우 입력을 한 칸 지우고 결과에 출력한다.', () => {
       $('.display-input').textContent = '123+123';
       $('.display-output').textContent = '246';
-      clickHandler('⬅');
+      clickHandler(BACKSPACE);
       expect($('.display-input').textContent).toBe('123+12');
-      expect($('.display-output').textContent).toBe('135');
+      expect($('.display-output').textContent).toBe('123+12');
     });
   });
 
-  //   describe('클리어 버튼을 클릭한다.', () => {
-  //     test('입력/출력 영역의 값을 모두 지운다.', () => {
-  //       clickHandler('C');
+  describe('클리어 버튼을 클릭한다.', () => {
+    test('입력/출력 영역의 값을 모두 지운다.', () => {
+      clickHandler(CLEAR);
+      expect($('.display-input').textContent).toBe('');
+      expect($('.display-output').textContent).toBe('');
+    });
+  });
+
+  describe('0 버튼을 클릭한다.', () => {
+    test('앞자리가 0이라면 0이 지워지고 자연수가 입력된다.', () => {
+      clickHandler(NUM_0);
+      expect(true).toBe(true);
+    });
+    test('앞자리가 자연수라면 0이 입력된다.', () => {
+      $('.display-input').textContent = '4';
+      clickHandler(NUM_0);
+      expect($('.display-input').textContent).toBe('40');
+    });
+    test('앞자리가 0이고 0을 입력하면 0은 하나만 출력된다.', () => {
+      $('.display-input').textContent = '0';
+      clickHandler(NUM_0);
+      expect($('.display-input').textContent).toBe('0');
+    });
+    test('앞자리가 0이고, 소수점을 누르면 소수로서 입력된다.', () => {
+      $('.display-input').textContent = '0.';
+      clickHandler(NUM_0);
+      expect($('.display-input').textContent).toBe('0.0');
+      clickHandler(NUM_0);
+      expect($('.display-input').textContent).toBe('0.00');
+    });
+  });
+
+  // describe('등호 버튼을 클릭한다.', () => {
+  //   test('아무것도 없는 경우 출력을 유지한다.', () => {
+  //     expect(true).toBe(true);
+  //   });
+  //   test('마지막이 피연산자인 경우 결과 영역에 입력을 비우고 결과를 출력한다.', () => {
+  //     expect(true).toBe(true);
+  //   });
+  //   test('마지막이 연산자인 경우 결과 영역에 입력을 비우고 결과를 출력한다.', () => {
+  //     expect(true).toBe(true);
+  //   });
+  //   test('결과가 존재하는 경우 출력을 유지한다.', () => {
+  //     expect(true).toBe(true);
+  //   });
+  // });
+
+  // describe('피연산자가 존재하지 않을 때 연산자를 입력한 경우', () => {
+  //   test('피연산자가 존재하지 않을 경우 연산자가 입력되지 않는다.', () => {
+  //     for (const operator of ['+', '-', 'x', '/', '%']) {
+  //       $('.display-input').textContent = operator;
   //       expect($('.display-input').textContent).toBe('');
-  //       expect($('.display-output').textContent).toBe('');
-  //     });
+  //     }
   //   });
+  // });
 
-  //   describe('0 버튼을 클릭한다.', () => {
-  //     test('앞자리고 0이라면 0이 지워지고 자연수가 입력된다.', () => {
-  //       clickHandler('0');
-  //       expect(true).toBe(true);
-  //     });
-  //     test('앞자리가 자연수라면 0이 입력된다.', () => {
-  //       $('.display-input').textContent = '4';
-  //       clickHandler('0');
-  //       expect($('.display-input').textContent).toBe('40');
-  //     });
-  //     test('앞자리가 0이고 0을 입력하면 0은 하나만 출력된다.', () => {
-  //       $('.display-input').textContent = '0';
-  //       clickHandler('0');
-  //       expect($('.display-input').textContent).toBe('0');
-  //     });
-  //     test('앞자리가 0이고, 소수점을 누르면 소수로서 입력된다.', () => {
-  //       $('.display-input').textContent = '0.';
-  //       clickHandler('0');
-  //       expect($('.display-input').textContent).toBe('0.0');
-  //       clickHandler('0');
-  //       expect($('.display-input').textContent).toBe('0.00');
-  //     });
+  // describe('소수점 버튼을 클릭한다.', () => {
+  //   test('소수점이 존재하는 경우 앞을 정수로 바꾼 뒤 소수점을 새로 찍는다.', () => {
+  //     expect(true).toBe(true);
   //   });
+  //   test('소수점이 존재하지 않는 경우 소수로써 입력된다.', () => {
+  //     expect(true).toBe(true);
+  //   });
+  //   test('아무것도 없는 경우 0. 으로 입력된다.', () => {
+  //     expect(true).toBe(true);
+  //   });
+  // });
 
-  //   describe('등호 버튼을 클릭한다.', () => {
-  //     test('아무것도 없는 경우 출력을 유지한다.', () => {
-  //       expect(true).toBe(true);
-  //     });
-  //     test('마지막이 피연산자인 경우 결과 영역에 입력을 비우고 결과를 출력한다.', () => {
-  //       expect(true).toBe(true);
-  //     });
-  //     test('마지막이 연산자인 경우 결과 영역에 입력을 비우고 결과를 출력한다.', () => {
-  //       expect(true).toBe(true);
-  //     });
-  //     test('결과가 존재하는 경우 출력을 유지한다.', () => {
-  //       expect(true).toBe(true);
-  //     });
+  // describe('부호 버튼을 클릭한다.', () => {
+  //   test('입력 값이 있으면 부호를 변경한다.', () => {
+  //     expect(true).toBe(true);
   //   });
+  //   test('입력 값이 0일 때는 입력을 유지한다.', () => {
+  //     expect(true).toBe(true);
+  //   });
+  // });
 
-  //   describe('피연산자가 존재하지 않을 때 연산자를 입력한 경우', () => {
-  //     test('피연산자가 존재하지 않을 경우 연산자가 입력되지 않는다.', () => {
-  //       for (const operator of ['+', '-', 'x', '/', '%']) {
-  //         $('.display-input').textContent = operator;
-  //         expect($('.display-input').textContent).toBe('');
-  //       }
-  //     });
+  // describe('세자리 수마다 콤마를 찍는다.', () => {
+  //   test('세자리 수마다 콤마를 찍는다.', () => {
+  //     expect(true).toBe(true);
   //   });
+  // });
 
-  //   describe('소수점 버튼을 클릭한다.', () => {
-  //     test('소수점이 존재하는 경우 앞을 정수로 바꾼 뒤 소수점을 새로 찍는다.', () => {
-  //       expect(true).toBe(true);
-  //     });
-  //     test('소수점이 존재하지 않는 경우 소수로써 입력된다.', () => {
-  //       expect(true).toBe(true);
-  //     });
-  //     test('아무것도 없는 경우 0. 으로 입력된다.', () => {
-  //       expect(true).toBe(true);
-  //     });
+  // describe('하나의 피연산자가 가질 수 있는 최대 자리수는 15자리다.', () => {
+  //   test('자리수를 초과하게 되면 입력을 할 수 없다.', () => {
+  //     expect(true).toBe(true);
   //   });
-
-  //   describe('부호 버튼을 클릭한다.', () => {
-  //     test('입력 값이 있으면 부호를 변경한다.', () => {
-  //       expect(true).toBe(true);
-  //     });
-  //     test('입력 값이 0일 때는 입력을 유지한다.', () => {
-  //       expect(true).toBe(true);
-  //     });
-  //   });
-
-  //   describe('세자리 수마다 콤마를 찍는다.', () => {
-  //     test('세자리 수마다 콤마를 찍는다.', () => {
-  //       expect(true).toBe(true);
-  //     });
-  //   });
-
-  //   describe('하나의 피연산자가 가질 수 있는 최대 자리수는 15자리다.', () => {
-  //     test('자리수를 초과하게 되면 입력을 할 수 없다.', () => {
-  //       expect(true).toBe(true);
-  //     });
-  //   });
+  // });
 });
 
 // describe('이력', () => {
