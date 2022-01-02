@@ -11,7 +11,7 @@ const { $, displayRender } = util.dom;
 export const clickHandler = ({ target }) => {
   if (!target.matches('div[data-digit]')) return;
   // 현재 입력된 값
-  const keyword = target.innerText;
+  const keyword = target.textContent;
 
   const $input = $('.display-input');
   const $output = $('.display-output');
@@ -49,7 +49,7 @@ const keyMap = new Map([
   [DIGIT, ({ input, key }) => [`${Keypad.digits(input)}${key}`, null]],
 ]);
 
-const features = (key, input, { innerText: output }) => {
+const features = (key, input, { textContent: output }) => {
   const [inputText, outputText] = keyMap.get(mapKeyParsing(key))({ input, output, key });
   return [putComma(parsedOperandLength(inputText)), outputText];
 };
@@ -80,6 +80,8 @@ const modalClickHandler = ({ target }) => {
   modalToggle();
 };
 
-$keypad.addEventListener('click', clickHandler);
-$logButton.addEventListener('click', modalToggle);
-$modal.addEventListener('click', modalClickHandler);
+document.addEventListener('DOMContentLoaded', () => {
+  $keypad.addEventListener('click', clickHandler);
+  $logButton.addEventListener('click', modalToggle);
+  $modal.addEventListener('click', modalClickHandler);
+});

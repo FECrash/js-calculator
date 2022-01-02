@@ -12,6 +12,6 @@ export const $sibling = ($element, parent, targetSelector) =>
   $(targetSelector, $element.closest(parent));
 
 export const displayRender = ({ input, $input }, { output, $output }) => {
-  $input.innerText = input;
-  $output.innerText = output;
+  $input.textContent = input;
+  $output.textContent = output;
 };
